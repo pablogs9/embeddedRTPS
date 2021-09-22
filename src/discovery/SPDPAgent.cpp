@@ -177,8 +177,6 @@ void SPDPAgent::processProxyData() {
 #if SPDP_VERBOSE && RTPS_GLOBAL_VERBOSE
     SPDP_LOG("Added new participant with guid: ");
     printGuidPrefix(m_proxyDataBuffer.m_guid.prefix);
-  } else {
-    SPDP_LOG("Failed to add new participant");
 #endif
   }
   else {

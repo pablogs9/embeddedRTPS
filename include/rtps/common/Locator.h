@@ -63,6 +63,11 @@ struct Locator {
 
   bool isValid() const { return kind != LocatorKind_t::LOCATOR_KIND_INVALID; }
 
+  void printLocator() const {
+    printf("Locator: %d.%d.%d.%d:%d\n", address[12], address[13], address[14],
+        address[15], port);
+  }
+
   bool readFromUcdrBuffer(ucdrBuffer &buffer) {
     if (ucdr_buffer_remaining(&buffer) < sizeof(Locator)) {
       return false;

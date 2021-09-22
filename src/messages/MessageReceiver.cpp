@@ -151,7 +151,7 @@ bool MessageReceiver::processDataSubmessage(
 #if RECV_VERBOSE
     RECV_LOG("Received ENTITYID_UNKNOWN readerID, searching for writer ID = ");
     printGuid(Guid_t{sourceGuidPrefix, dataSubmsg.writerId});
-    print("\n");
+    printf("\n");
 #endif
     reader = mp_part->getReaderByWriterId(
         Guid_t{sourceGuidPrefix, dataSubmsg.writerId});
@@ -166,7 +166,7 @@ bool MessageReceiver::processDataSubmessage(
     if (reader_by_writer == nullptr && reader != nullptr) {
       RECV_LOG("FOUND By READER ID, NOT BY WRITER ID =");
       printGuid(Guid_t{sourceGuidPrefix, dataSubmsg.writerId});
-      print("\n");
+      printf("\n");
     }
 #endif
   }
@@ -179,7 +179,7 @@ bool MessageReceiver::processDataSubmessage(
 #if RECV_VERBOSE && RTPS_GLOBAL_VERBOSE
     RECV_LOG("Couldn't find a reader with id: ");
     printEntityId(dataSubmsg.readerId);
-    print("\n");
+    printf("\n");
 #endif
   }
 
