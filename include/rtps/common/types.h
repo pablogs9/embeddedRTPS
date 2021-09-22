@@ -25,7 +25,6 @@ Author: i11 - Embedded Software, RWTH Aachen University
 #ifndef RTPS_TYPES_H
 #define RTPS_TYPES_H
 
-#include "lwip/opt.h"
 #include "lwip/ip4_addr.h"
 
 #include <array>
