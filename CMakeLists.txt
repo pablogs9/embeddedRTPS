@@ -22,32 +22,26 @@ set(${PROJECT_NAME}_sources
     src/storages/HistoryCache.cpp
     src/rtps.cpp
     thirdparty/lwip/default_netif.c
-    # thirdparty/Micro-CDR/src/c/types/sequence.c
-    # thirdparty/Micro-CDR/src/c/types/basic.c
-    # thirdparty/Micro-CDR/src/c/types/string.c
-    # thirdparty/Micro-CDR/src/c/types/array.c
-    # thirdparty/Micro-CDR/src/c/common.c
 )
+
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
 
-target_link_libraries(${PROJECT_NAME}
-  microcdr
-)
+ament_target_dependencies(${PROJECT_NAME} microcdr)
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-  "$<INSTALL_INTERFACE:include>")
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lwip>"
     "$<INSTALL_INTERFACE:include>")
 
+target_include_directories(${PROJECT_NAME} PRIVATE
+    "$<BUILD_INTERFACE:${microcdr_INCLUDE_DIR}>"
+  )
+
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_targets(${PROJECT_NAME})
-
 ament_export_include_directories(${microcdr_INCLUDE_DIR})
 
 ament_package()
