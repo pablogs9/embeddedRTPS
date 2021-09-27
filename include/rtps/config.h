@@ -27,6 +27,8 @@ Author: i11 - Embedded Software, RWTH Aachen University
 
 #include "rtps/common/types.h"
 
+extern uint8_t IP_ADDRESS[4];
+
 namespace rtps {
 
 #define IS_LITTLE_ENDIAN 1
@@ -36,16 +38,15 @@ namespace rtps {
 
 namespace Config {
 const VendorId_t VENDOR_ID = {13, 37};
-const std::array<uint8_t, 4> IP_ADDRESS = {
-    192, 168, 1, 162}; // Needs to be set in lwipcfg.h too.
+
 const GuidPrefix_t BASE_GUID_PREFIX{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12};
 
-const uint8_t DOMAIN_ID = 0; // 230 possible with UDP
-const uint8_t NUM_STATELESS_WRITERS = 2;
-const uint8_t NUM_STATELESS_READERS = 2;
-const uint8_t NUM_STATEFUL_READERS = 2;
-const uint8_t NUM_STATEFUL_WRITERS = 2;
-const uint8_t MAX_NUM_PARTICIPANTS = 1;
+const uint8_t DOMAIN_ID = 3; // 230 possible with UDP
+const uint8_t NUM_STATELESS_WRITERS = 5;
+const uint8_t NUM_STATELESS_READERS = 5;
+const uint8_t NUM_STATEFUL_READERS = 5;
+const uint8_t NUM_STATEFUL_WRITERS = 5;
+const uint8_t MAX_NUM_PARTICIPANTS = 2;
 const uint8_t NUM_WRITERS_PER_PARTICIPANT = 4;
 const uint8_t NUM_READERS_PER_PARTICIPANT = 4;
 const uint8_t NUM_WRITER_PROXIES_PER_READER = 3;
@@ -71,7 +72,7 @@ const uint8_t SPDP_CYCLECOUNT_HEARTBEAT =
 const uint8_t SPDP_WRITER_PRIO = 3;
 const uint8_t SPDP_MAX_NUMBER_FOUND_PARTICIPANTS = 5;
 const uint8_t SPDP_MAX_NUM_LOCATORS = 5;
-const Duration_t SPDP_LEASE_DURATION = {100, 0};
+const Duration_t SPDP_LEASE_DURATION = {20, 0};
 const Duration_t SPDP_DEFAULT_REMOTE_LEASE_DURATION = {100, 0};
 const Duration_t SPDP_MAX_REMOTE_LEASE_DURATION = {180, 0};
 
