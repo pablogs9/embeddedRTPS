@@ -2,7 +2,12 @@ cmake_minimum_required(VERSION 3.5)
 
 project(embeddedrtps)
 
+find_package(ament_cmake_ros REQUIRED)
+find_package(microcdr REQUIRED)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
   # Add lwIP
   SET(LWIP_CONTRIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/contrib")
   SET(LWIP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lwip")
@@ -28,16 +33,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   add_library(lwip STATIC ${lwipcore_SRCS} ${lwipcore3_SRCS} ${lwipcontribportunix_SRCS})
 
   target_include_directories(lwip PUBLIC ${LWIP_INCLUDE_DIRS})
-  include_directories(lwip PUBLIC embeddedrtps/thirdparty/lwip/)
+  include_directories(lwip PUBLIC thirdparty/lwip/)
 
   target_compile_options(lwip PRIVATE ${LWIP_COMPILER_FLAGS})
   target_compile_definitions(lwip PRIVATE ${LWIP_DEFINITIONS})
 
   target_link_libraries(lwip ${LWIP_SANITIZER_LIBS}  lwipcontribaddons lwipallapps lwipcore lwipcontribportunix)
 endif()
-
-find_package(ament_cmake_ros REQUIRED)
-find_package(microcdr REQUIRED)
 
 set(${PROJECT_NAME}_sources
     src/discovery/TopicData.cpp
@@ -61,10 +63,11 @@ set(${PROJECT_NAME}_sources
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
 
-ament_target_dependencies(${PROJECT_NAME} microcdr)
-
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  target_link_libraries(${PROJECT_NAME} PRIVATE lwip microcdr)
+  target_link_libraries(${PROJECT_NAME} PRIVATE lwip)
+
+  target_include_directories(${PROJECT_NAME} PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lwip/src/include>")
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -76,7 +79,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     "$<BUILD_INTERFACE:${microcdr_INCLUDE_DIR}>"
   )
 
-ament_export_include_directories(include)
+ament_target_dependencies(${PROJECT_NAME} microcdr)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_targets(${PROJECT_NAME})
 ament_export_include_directories(${microcdr_INCLUDE_DIR})
