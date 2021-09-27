@@ -27,14 +27,14 @@ Author: i11 - Embedded Software, RWTH Aachen University
 
 #include "rtps/common/types.h"
 
-extern uint8_t IP_ADDRESS[4];
+const uint8_t IP_ADDRESS[] = {192, 168, 1, 57}; // Needs to be set in lwipcfg.h too.
 
 namespace rtps {
 
 #define IS_LITTLE_ENDIAN 1
 
 // define only if using FreeRTOS
-#define OS_IS_FREERTOS
+// #define OS_IS_FREERTOS
 
 namespace Config {
 const VendorId_t VENDOR_ID = {13, 37};

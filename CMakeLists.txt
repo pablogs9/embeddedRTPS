@@ -39,6 +39,17 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_compile_definitions(lwip PRIVATE ${LWIP_DEFINITIONS})
 
   target_link_libraries(lwip ${LWIP_SANITIZER_LIBS}  lwipcontribaddons lwipallapps lwipcore lwipcontribportunix)
+
+  install(
+    TARGETS
+      lwip
+      lwipcontribaddons
+      lwipallapps
+      lwipcore
+      lwipcontribportunix
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin)
 endif()
 
 set(${PROJECT_NAME}_sources
@@ -91,6 +102,23 @@ install(
   DIRECTORY include/
   DESTINATION include
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+install(
+  DIRECTORY lwip/src/include/
+  DESTINATION include
+)
+
+install(
+  DIRECTORY thirdparty/lwip
+  DESTINATION include
+)
+
+install(
+  DIRECTORY contrib/ports/unix/port/include/arch
+  DESTINATION include
+)
+endif()
 
 # Install library.
 install(
