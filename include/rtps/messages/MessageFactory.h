@@ -101,7 +101,9 @@ void addSubMessageTimeStamp(Buffer &buffer, bool setInvalid = false) {
 template <class Buffer>
 void addSubMessageData(Buffer &buffer, const Buffer &filledPayload,
                        bool containsInlineQos, const SequenceNumber_t &SN,
-                       const EntityId_t &writerID, const EntityId_t &readerID) {
+                       const EntityId_t &writerID, const EntityId_t &readerID,
+                       const Guid_t relatedWriterGuid = GUID_UNKNOWN,
+                       const SequenceNumber_t relatedSequenceNumber = SEQUENCENUMBER_UNKNOWN) {
   SubmessageData msg;
   msg.header.submessageId = SubmessageKind::DATA;
 #if IS_LITTLE_ENDIAN
@@ -121,6 +123,12 @@ void addSubMessageData(Buffer &buffer, const Buffer &filledPayload,
     msg.header.flags |= FLAG_DATA_PAYLOAD;
   }
 
+  if(!(relatedWriterGuid == GUID_UNKNOWN) && !(relatedSequenceNumber == SEQUENCENUMBER_UNKNOWN)){
+    containsInlineQos = true;
+    msg.header.flags |= FLAG_INLINE_QOS;
+    msg.header.octetsToNextHeader += 32;
+  }
+
   msg.writerSN = SN;
   msg.extraFlags = 0;
   msg.readerId = readerID;
@@ -132,6 +140,26 @@ void addSubMessageData(Buffer &buffer, const Buffer &filledPayload,
 
   serializeMessage(buffer, msg);
 
+  // Add inline QoS
+
+  if (containsInlineQos && !(relatedWriterGuid == GUID_UNKNOWN) && !(relatedSequenceNumber == SEQUENCENUMBER_UNKNOWN)) {
+    buffer.reserve(32);
+    SMElement::ParameterId id = SMElement::ParameterId::PID_RELATED_SAMPLE_IDENTITY;
+    buffer.append(reinterpret_cast<uint8_t *>(&id), sizeof(uint16_t));
+    uint16_t length = 24;
+    buffer.append(reinterpret_cast<uint8_t *>(&length), sizeof(uint16_t));
+    buffer.append(reinterpret_cast<const uint8_t *>(relatedWriterGuid.prefix.id.data()), 12);
+    buffer.append(reinterpret_cast<const uint8_t *>(relatedWriterGuid.entityId.entityKey.data()), 3);
+    buffer.append(reinterpret_cast<const uint8_t *>(&relatedWriterGuid.entityId.entityKind), 1);
+    buffer.append(reinterpret_cast<const uint8_t *>(&relatedSequenceNumber.high), sizeof(uint32_t));
+    buffer.append(reinterpret_cast<const uint8_t *>(&relatedSequenceNumber.low), sizeof(uint32_t));
+    id = SMElement::ParameterId::PID_SENTINEL;
+    buffer.append(reinterpret_cast<uint8_t *>(&id), sizeof(uint16_t));
+    length = 0;
+    buffer.append(reinterpret_cast<uint8_t *>(&length), sizeof(uint16_t));
+  }
+
+  // Add data
   if (filledPayload.isValid()) {
     Buffer shallowCopy = filledPayload;
     buffer.append(std::move(shallowCopy));

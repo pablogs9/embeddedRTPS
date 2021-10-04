@@ -45,7 +45,9 @@ public:
   //! worker threads
   virtual void progress() = 0;
   virtual const CacheChange *newChange(ChangeKind_t kind, const uint8_t *data,
-                                       DataSize_t size) = 0;
+                                       DataSize_t size, Guid_t related_guid = GUID_UNKNOWN,
+                                       SequenceNumber_t related_sequence_no = SEQUENCENUMBER_UNKNOWN) = 0;
+
   virtual void setAllChangesToUnsent() = 0;
   virtual void onNewAckNack(const SubmessageAckNack &msg,
                             const GuidPrefix_t &sourceGuidPrefix) = 0;

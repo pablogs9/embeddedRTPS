@@ -138,11 +138,12 @@ bool MessageReceiver::processDataSubmessage(
   }
 
   const uint8_t *serializedData =
-      msgInfo.getPointerToCurrentPos() + SubmessageData::getRawSize();
+      msgInfo.getPointerToCurrentPos() + SubmessageData::getRawSize() + dataSubmsg.inlineQosSize;
 
   const DataSize_t size = submsgHeader.octetsToNextHeader -
                           SubmessageData::getRawSize() +
-                          SubmessageHeader::getRawSize();
+                          SubmessageHeader::getRawSize() -
+                          + dataSubmsg.inlineQosSize;
 
   RECV_LOG("Received data message size %u", (int)size);
 
