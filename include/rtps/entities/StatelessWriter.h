@@ -47,7 +47,8 @@ public:
   void removeReaderOfParticipant(const GuidPrefix_t &guidPrefix) override;
   void progress() override;
   const CacheChange *newChange(ChangeKind_t kind, const uint8_t *data,
-                               DataSize_t size) override;
+                               DataSize_t size, Guid_t related_guid = GUID_UNKNOWN,
+                               SequenceNumber_t related_sequence_no = SEQUENCENUMBER_UNKNOWN) override;
   void setAllChangesToUnsent() override;
   void onNewAckNack(const SubmessageAckNack &msg,
                     const GuidPrefix_t &sourceGuidPrefix) override;

@@ -34,6 +34,9 @@ struct CacheChange {
   SequenceNumber_t sequenceNumber = SEQUENCENUMBER_UNKNOWN;
   PBufWrapper data{};
 
+  Guid_t relatedWriterGuid = GUID_UNKNOWN;
+  SequenceNumber_t relatedSequenceNumber = SEQUENCENUMBER_UNKNOWN;
+
   CacheChange() = default;
   CacheChange(ChangeKind_t kind, SequenceNumber_t sequenceNumber)
       : kind(kind), sequenceNumber(sequenceNumber){};

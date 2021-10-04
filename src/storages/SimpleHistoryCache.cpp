@@ -55,12 +55,16 @@ const rtps::SequenceNumber_t &SimpleHistoryCache::getSeqNumMax() const {
 }
 
 const rtps::CacheChange *SimpleHistoryCache::addChange(const uint8_t *data,
-                                                       DataSize_t size) {
+                                                       DataSize_t size, Guid_t related_guid,
+                                                       SequenceNumber_t related_sequence_no) {
   CacheChange change;
   change.kind = ChangeKind_t::ALIVE;
   change.data.reserve(size);
   change.data.append(data, size);
   change.sequenceNumber = ++m_lastUsedSequenceNumber;
+
+  change.relatedWriterGuid = related_guid;
+  change.relatedSequenceNumber = related_sequence_no;
 
   CacheChange *place = &m_buffer[m_head];
   incrementHead();

@@ -97,6 +97,30 @@ bool rtps::deserializeMessage(const MessageProcessingInfo &info,
                   sizeof(msg.writerSN.high));
   doCopyAndMoveOn(reinterpret_cast<uint8_t *>(&msg.writerSN.low), currentPos,
                   sizeof(msg.writerSN.low));
+
+  msg.inlineQosSize = 0;
+  if (msg.header.flags & FLAG_INLINE_QOS) {
+    bool available_qos = true;
+    while(available_qos){
+      SMElement::ParameterId pid;
+      uint16_t length;
+      // static uint8_t buffer[256];
+
+      doCopyAndMoveOn(reinterpret_cast<uint8_t *>(&pid), currentPos, sizeof(pid));
+      doCopyAndMoveOn(reinterpret_cast<uint8_t *>(&length), currentPos, sizeof(length));
+      // doCopyAndMoveOn(buffer, currentPos, length);
+      currentPos += length;
+      msg.inlineQosSize += sizeof(pid) + sizeof(length) + length;
+
+      // Parameter lists are 4-byte aligned
+      msg.inlineQosSize = msg.inlineQosSize + 3 & ~3;
+
+      if(pid == SMElement::PID_SENTINEL){
+        available_qos = false;
+      }
+    }
+  }
+
   return true;
 }
 
