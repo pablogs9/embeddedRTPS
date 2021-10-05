@@ -47,6 +47,9 @@ public:
   const Guid_t writerGuid;
   const SequenceNumber_t sn;
 
+  Guid_t relatedWriterGuid = GUID_UNKNOWN;
+  SequenceNumber_t relatedSequenceNumber = SEQUENCENUMBER_UNKNOWN;
+
   ReaderCacheChange(ChangeKind_t kind, Guid_t &writerGuid, SequenceNumber_t sn,
                     const uint8_t *data, DataSize_t size)
       : data(data), kind(kind), size(size), writerGuid(writerGuid), sn(sn){};

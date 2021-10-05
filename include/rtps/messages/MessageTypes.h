@@ -177,6 +177,10 @@ struct SubmessageData {
   EntityId_t writerId;
   SequenceNumber_t writerSN;
   size_t inlineQosSize;
+
+  Guid_t relatedWriterGuid = GUID_UNKNOWN;
+  SequenceNumber_t relatedSequenceNumber = SEQUENCENUMBER_UNKNOWN;
+
   static constexpr uint16_t getRawSize() {
     return SubmessageHeader::getRawSize() + sizeof(uint16_t) +
            sizeof(uint16_t) + (2 * 3 + 2 * 1) // EntityID

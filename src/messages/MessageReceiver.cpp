@@ -175,6 +175,8 @@ bool MessageReceiver::processDataSubmessage(
     Guid_t writerGuid{sourceGuidPrefix, dataSubmsg.writerId};
     ReaderCacheChange change{ChangeKind_t::ALIVE, writerGuid,
                              dataSubmsg.writerSN, serializedData, size};
+    change.relatedWriterGuid = dataSubmsg.relatedWriterGuid;
+    change.relatedSequenceNumber = dataSubmsg.relatedSequenceNumber;
     reader->newChange(change);
   } else {
 #if RECV_VERBOSE && RTPS_GLOBAL_VERBOSE

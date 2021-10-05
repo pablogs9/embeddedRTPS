@@ -109,14 +109,23 @@ bool rtps::deserializeMessage(const MessageProcessingInfo &info,
       doCopyAndMoveOn(reinterpret_cast<uint8_t *>(&pid), currentPos, sizeof(pid));
       doCopyAndMoveOn(reinterpret_cast<uint8_t *>(&length), currentPos, sizeof(length));
       // doCopyAndMoveOn(buffer, currentPos, length);
-      currentPos += length;
       msg.inlineQosSize += sizeof(pid) + sizeof(length) + length;
 
       // Parameter lists are 4-byte aligned
       msg.inlineQosSize = msg.inlineQosSize + 3 & ~3;
 
-      if(pid == SMElement::PID_SENTINEL){
+      if (pid == SMElement::PID_RELATED_SAMPLE_IDENTITY) {
+        // Deserilize in Guid_t relatedWriterGuid and SequenceNumber_t relatedSequenceNumber
+        doCopyAndMoveOn(reinterpret_cast<uint8_t *>(msg.relatedWriterGuid.prefix.id.data()), currentPos, msg.relatedWriterGuid.prefix.id.size());
+        doCopyAndMoveOn(reinterpret_cast<uint8_t *>(msg.relatedWriterGuid.entityId.entityKey.data()), currentPos, msg.relatedWriterGuid.entityId.entityKey.size());
+        doCopyAndMoveOn(reinterpret_cast<uint8_t *>(&msg.relatedWriterGuid.entityId.entityKind), currentPos, sizeof(msg.relatedWriterGuid.entityId.entityKind));
+        doCopyAndMoveOn(reinterpret_cast<uint8_t *>(&msg.relatedSequenceNumber.high), currentPos, sizeof(msg.relatedSequenceNumber.high));
+        doCopyAndMoveOn(reinterpret_cast<uint8_t *>(&msg.relatedSequenceNumber.low), currentPos, sizeof(msg.relatedSequenceNumber.low));
+      } else if(pid == SMElement::PID_SENTINEL) {
         available_qos = false;
+        currentPos += length;
+      } else {
+        currentPos += length;
       }
     }
   }
