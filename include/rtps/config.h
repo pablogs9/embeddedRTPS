@@ -35,6 +35,8 @@ namespace rtps {
 
 // define only if using FreeRTOS
 #define OS_IS_FREERTOS
+#include "FreeRTOS.h"
+#include "task.h"
 
 namespace Config {
 const VendorId_t VENDOR_ID = {13, 37};
