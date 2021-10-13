@@ -324,7 +324,7 @@ rtps::Writer *Domain::createWriter(Participant &part, const char *topicName,
   }
 
   // TODO Distinguish WithKey and NoKey (Also changes EntityKind)
-  TopicData attributes;
+  TopicData attributes(domainId);
 
   if (strlen(topicName) > Config::MAX_TOPICNAME_LENGTH ||
       strlen(typeName) > Config::MAX_TYPENAME_LENGTH) {
@@ -336,7 +336,7 @@ rtps::Writer *Domain::createWriter(Participant &part, const char *topicName,
   attributes.endpointGuid.entityId = {
       part.getNextUserEntityKey(),
       EntityKind_t::USER_DEFINED_WRITER_WITHOUT_KEY};
-  attributes.unicastLocator = getUserUnicastLocator(part.m_participantId);
+  attributes.unicastLocator = getUserUnicastLocator(part.m_participantId, domainId);
   attributes.durabilityKind = DurabilityKind_t::TRANSIENT_LOCAL;
 
   DOMAIN_LOG("Creating writer[%s, %s]\n", topicName, typeName);
@@ -375,7 +375,7 @@ rtps::Reader *Domain::createReader(Participant &part, const char *topicName,
   }
 
   // TODO Distinguish WithKey and NoKey (Also changes EntityKind)
-  TopicData attributes;
+  TopicData attributes(domainId);
 
   if (strlen(topicName) > Config::MAX_TOPICNAME_LENGTH ||
       strlen(typeName) > Config::MAX_TYPENAME_LENGTH) {
@@ -387,7 +387,7 @@ rtps::Reader *Domain::createReader(Participant &part, const char *topicName,
   attributes.endpointGuid.entityId = {
       part.getNextUserEntityKey(),
       EntityKind_t::USER_DEFINED_READER_WITHOUT_KEY};
-  attributes.unicastLocator = getUserUnicastLocator(part.m_participantId);
+  attributes.unicastLocator = getUserUnicastLocator(part.m_participantId, domainId);
   if (!isZeroAddress(mcastaddress)) {
     if (ip4_addr_ismulticast(&mcastaddress)) {
       attributes.multicastLocator = rtps::Locator::createUDPv4Locator(

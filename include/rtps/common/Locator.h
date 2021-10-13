@@ -115,10 +115,10 @@ inline Locator getBuiltInMulticastLocator(uint8_t domainId) {
   return Locator::createUDPv4Locator(239, 255, 0, 1, getBuiltInMulticastPort(domainId));
 }
 
-inline Locator getUserUnicastLocator(ParticipantId_t participantId) {
+inline Locator getUserUnicastLocator(ParticipantId_t participantId, uint8_t domainId) {
   return Locator::createUDPv4Locator(
       IP_ADDRESS[0], IP_ADDRESS[1], IP_ADDRESS[2],
-      IP_ADDRESS[3], getUserUnicastPort(participantId));
+      IP_ADDRESS[3], getUserUnicastPort(participantId, domainId));
 }
 
 inline Locator getUserMulticastLocator(uint8_t domainId) { // this would be a unicastaddress, as
