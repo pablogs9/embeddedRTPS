@@ -105,14 +105,14 @@ struct Locator {
 
 } __attribute__((packed));
 
-inline Locator getBuiltInUnicastLocator(ParticipantId_t participantId) {
+inline Locator getBuiltInUnicastLocator(ParticipantId_t participantId, uint8_t domainId) {
   return Locator::createUDPv4Locator(
       IP_ADDRESS[0], IP_ADDRESS[1], IP_ADDRESS[2],
-      IP_ADDRESS[3], getBuiltInUnicastPort(participantId));
+      IP_ADDRESS[3], getBuiltInUnicastPort(participantId, domainId));
 }
 
-inline Locator getBuiltInMulticastLocator() {
-  return Locator::createUDPv4Locator(239, 255, 0, 1, getBuiltInMulticastPort());
+inline Locator getBuiltInMulticastLocator(uint8_t domainId) {
+  return Locator::createUDPv4Locator(239, 255, 0, 1, getBuiltInMulticastPort(domainId));
 }
 
 inline Locator getUserUnicastLocator(ParticipantId_t participantId) {
@@ -121,15 +121,15 @@ inline Locator getUserUnicastLocator(ParticipantId_t participantId) {
       IP_ADDRESS[3], getUserUnicastPort(participantId));
 }
 
-inline Locator getUserMulticastLocator() { // this would be a unicastaddress, as
+inline Locator getUserMulticastLocator(uint8_t domainId) { // this would be a unicastaddress, as
                                            // defined in config
   return Locator::createUDPv4Locator(
       IP_ADDRESS[0], IP_ADDRESS[1], IP_ADDRESS[2],
-      IP_ADDRESS[3], getUserMulticastPort());
+      IP_ADDRESS[3], getUserMulticastPort(domainId));
 }
 
-inline Locator getDefaultSendMulticastLocator() {
-  return Locator::createUDPv4Locator(239, 255, 0, 1, getBuiltInMulticastPort());
+inline Locator getDefaultSendMulticastLocator(uint8_t domainId) {
+  return Locator::createUDPv4Locator(239, 255, 0, 1, getBuiltInMulticastPort(domainId));
 }
 } // namespace rtps
 

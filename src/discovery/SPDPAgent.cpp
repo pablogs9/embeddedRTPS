@@ -260,7 +260,7 @@ void SPDPAgent::endCurrentList() {
   ucdr_serialize_uint16_t(&m_microbuffer, 0);
 }
 
-void SPDPAgent::addParticipantParameters() {
+void SPDPAgent::addParticipantParameters(uint8_t domainId) {
   const uint16_t zero_options = 0;
   const uint16_t protocolVersionSize =
       sizeof(PROTOCOLVERSION.major) + sizeof(PROTOCOLVERSION.minor);
@@ -276,8 +276,8 @@ void SPDPAgent::addParticipantParameters() {
   const Locator userUniCastLocator =
       getUserUnicastLocator(mp_participant->m_participantId);
   const Locator builtInUniCastLocator =
-      getBuiltInUnicastLocator(mp_participant->m_participantId);
-  const Locator builtInMultiCastLocator = getBuiltInMulticastLocator();
+      getBuiltInUnicastLocator(mp_participant->m_participantId, domainId);
+  const Locator builtInMultiCastLocator = getBuiltInMulticastLocator(domainId);
 
   ucdr_serialize_array_uint8_t(&m_microbuffer,
                                rtps::SMElement::SCHEME_PL_CDR_LE.data(),

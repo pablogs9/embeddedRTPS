@@ -42,8 +42,8 @@ using rtps::Domain;
 Domain::Domain()
     : m_threadPool(receiveJumppad, this),
       m_transport(ThreadPool::readCallback, &m_threadPool) {
-  m_transport.createUdpConnection(getUserMulticastPort());
-  m_transport.createUdpConnection(getBuiltInMulticastPort());
+  m_transport.createUdpConnection(getUserMulticastPort(domainId));
+  m_transport.createUdpConnection(getBuiltInMulticastPort(domainId));
   m_transport.joinMultiCastGroup(transformIP4ToU32(239, 255, 0, 1));
 }
 
@@ -151,13 +151,13 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
   spdpWriterAttributes.endpointGuid.prefix = part.m_guidPrefix;
   spdpWriterAttributes.endpointGuid.entityId =
       ENTITYID_SPDP_BUILTIN_PARTICIPANT_WRITER;
-  spdpWriterAttributes.unicastLocator = getBuiltInMulticastLocator();
+  spdpWriterAttributes.unicastLocator = getBuiltInMulticastLocator(domainId);
 
   spdpWriter.init(spdpWriterAttributes, TopicKind_t::WITH_KEY, &m_threadPool,
                   m_transport);
   spdpWriter.addNewMatchedReader(
       ReaderProxy{{part.m_guidPrefix, ENTITYID_SPDP_BUILTIN_PARTICIPANT_READER},
-                  getBuiltInMulticastLocator()});
+                  getBuiltInMulticastLocator(domainId)});
 
   TopicData spdpReaderAttributes;
   spdpReaderAttributes.endpointGuid = {
@@ -178,7 +178,7 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
   sedpAttributes.durabilityKind = DurabilityKind_t::TRANSIENT_LOCAL;
   sedpAttributes.endpointGuid.prefix = part.m_guidPrefix;
   sedpAttributes.unicastLocator =
-      getBuiltInUnicastLocator(part.m_participantId);
+      getBuiltInUnicastLocator(part.m_participantId, domainId);
 
   // READER
   sedpAttributes.endpointGuid.entityId =
@@ -212,8 +212,8 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
 }
 
 void Domain::registerPort(const Participant &part) {
-  m_transport.createUdpConnection(getUserUnicastPort(part.m_participantId));
-  m_transport.createUdpConnection(getBuiltInUnicastPort(part.m_participantId));
+  m_transport.createUdpConnection(getUserUnicastPort(part.m_participantId, domainId));
+  m_transport.createUdpConnection(getBuiltInUnicastPort(part.m_participantId, domainId));
 }
 
 void Domain::registerMulticastPort(Locator mcastLocator) {
@@ -393,7 +393,7 @@ rtps::Reader *Domain::createReader(Participant &part, const char *topicName,
       attributes.multicastLocator = rtps::Locator::createUDPv4Locator(
           ip4_addr1(&mcastaddress), ip4_addr2(&mcastaddress),
           ip4_addr3(&mcastaddress), ip4_addr4(&mcastaddress),
-          getUserMulticastPort());
+          getUserMulticastPort(domainId));
       m_transport.joinMultiCastGroup(
           attributes.multicastLocator.getIp4Address());
       registerMulticastPort(attributes.multicastLocator);

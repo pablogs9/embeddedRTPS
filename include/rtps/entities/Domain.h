@@ -38,6 +38,7 @@ Author: i11 - Embedded Software, RWTH Aachen University
 namespace rtps {
 class Domain {
 public:
+  uint8_t domainId = 0;
   Domain();
   ~Domain();
 
