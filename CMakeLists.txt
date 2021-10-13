@@ -22,7 +22,7 @@ set(RMW_ERTPS_TYPE_NAME_MAX_LENGTH "200" CACHE STRING "This value sets the maxim
 
 # Create source files with the define
 configure_file(${PROJECT_SOURCE_DIR}/include/rtps/config.h.in
-  ${PROJECT_BINARY_DIR}/include/rtps/config.h)
+  ${PROJECT_SOURCE_DIR}/include/rtps/config.h)
 
 set(${PROJECT_NAME}_sources
     src/discovery/TopicData.cpp
