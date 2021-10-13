@@ -324,7 +324,7 @@ rtps::Writer *Domain::createWriter(Participant &part, const char *topicName,
   }
 
   // TODO Distinguish WithKey and NoKey (Also changes EntityKind)
-  TopicData attributes(domainId);
+  TopicData attributes;
 
   if (strlen(topicName) > Config::MAX_TOPICNAME_LENGTH ||
       strlen(typeName) > Config::MAX_TYPENAME_LENGTH) {
@@ -375,7 +375,7 @@ rtps::Reader *Domain::createReader(Participant &part, const char *topicName,
   }
 
   // TODO Distinguish WithKey and NoKey (Also changes EntityKind)
-  TopicData attributes(domainId);
+  TopicData attributes;
 
   if (strlen(topicName) > Config::MAX_TOPICNAME_LENGTH ||
       strlen(typeName) > Config::MAX_TYPENAME_LENGTH) {
