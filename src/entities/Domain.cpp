@@ -144,7 +144,7 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
   StatelessWriter &spdpWriter = m_statelessWriters[m_numStatelessWriters++];
   StatelessReader &spdpReader = m_statelessReaders[m_numStatelessReaders++];
 
-  TopicData spdpWriterAttributes;
+  TopicData spdpWriterAttributes(domainId);
   spdpWriterAttributes.topicName[0] = '\0';
   spdpWriterAttributes.typeName[0] = '\0';
   spdpWriterAttributes.reliabilityKind = ReliabilityKind_t::BEST_EFFORT;
@@ -160,7 +160,7 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
       ReaderProxy{{part.m_guidPrefix, ENTITYID_SPDP_BUILTIN_PARTICIPANT_READER},
                   getBuiltInMulticastLocator(domainId)});
 
-  TopicData spdpReaderAttributes;
+  TopicData spdpReaderAttributes(domainId);
   spdpReaderAttributes.endpointGuid = {
       part.m_guidPrefix, ENTITYID_SPDP_BUILTIN_PARTICIPANT_READER};
   spdpReader.init(spdpReaderAttributes);
@@ -172,7 +172,7 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
   StatefulWriter &sedpSubWriter = m_statefulWriters[m_numStatefulWriters++];
 
   // Prepare attributes
-  TopicData sedpAttributes;
+  TopicData sedpAttributes(domainId);
   sedpAttributes.topicName[0] = '\0';
   sedpAttributes.typeName[0] = '\0';
   sedpAttributes.reliabilityKind = ReliabilityKind_t::RELIABLE;
@@ -325,7 +325,7 @@ rtps::Writer *Domain::createWriter(Participant &part, const char *topicName,
   }
 
   // TODO Distinguish WithKey and NoKey (Also changes EntityKind)
-  TopicData attributes;
+  TopicData attributes(domainId);
 
   if (strlen(topicName) > Config::MAX_TOPICNAME_LENGTH ||
       strlen(typeName) > Config::MAX_TYPENAME_LENGTH) {
@@ -376,7 +376,7 @@ rtps::Reader *Domain::createReader(Participant &part, const char *topicName,
   }
 
   // TODO Distinguish WithKey and NoKey (Also changes EntityKind)
-  TopicData attributes;
+  TopicData attributes(domainId);
 
   if (strlen(topicName) > Config::MAX_TOPICNAME_LENGTH ||
       strlen(typeName) > Config::MAX_TYPENAME_LENGTH) {

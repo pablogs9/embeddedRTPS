@@ -101,7 +101,7 @@ void SEDPAgent::onNewPublisher(const ReaderCacheChange &change) {
   ucdrBuffer cdrBuffer;
   ucdr_init_buffer(&cdrBuffer, m_buffer, sizeof(m_buffer));
 
-  TopicData topicData;
+  TopicData topicData(m_part->domainId);
   if (topicData.readFromUcdrBuffer(cdrBuffer)) {
     onNewPublisher(topicData);
   }
@@ -181,7 +181,7 @@ void SEDPAgent::onNewSubscriber(const ReaderCacheChange &change) {
   ucdrBuffer cdrBuffer;
   ucdr_init_buffer(&cdrBuffer, m_buffer, sizeof(m_buffer));
 
-  TopicData topicData;
+  TopicData topicData(m_part->domainId);
   if (topicData.readFromUcdrBuffer(cdrBuffer)) {
     onNewSubscriber(topicData);
   }
