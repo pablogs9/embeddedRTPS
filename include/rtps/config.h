@@ -43,7 +43,7 @@ const VendorId_t VENDOR_ID = {13, 37};
 
 const GuidPrefix_t BASE_GUID_PREFIX{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12};
 
-const uint8_t DOMAIN_ID = 0; // 230 possible with UDP
+const uint8_t DOMAIN_ID = 3; // 230 possible with UDP
 const uint8_t NUM_STATELESS_WRITERS = 5;
 const uint8_t NUM_STATELESS_READERS = 5;
 const uint8_t NUM_STATEFUL_READERS = 5;
@@ -69,9 +69,14 @@ const uint16_t SPDP_WRITER_STACKSIZE = 4000;    // byte
 
 const uint16_t SF_WRITER_HB_PERIOD_MS = 1000;
 const uint16_t SPDP_RESEND_PERIOD_MS = 1000;
-const uint8_t SPDP_CYCLECOUNT_HEARTBEAT =
-    2; // skip x SPDP rounds before checking liveliness
+const uint8_t SPDP_CYCLECOUNT_HEARTBEAT = 2; // skip x SPDP rounds before checking liveliness
+
+#ifdef STM32CUBEIDE
+const uint8_t SPDP_WRITER_PRIO = 19;
+#else
 const uint8_t SPDP_WRITER_PRIO = 3;
+#endif
+
 const uint8_t SPDP_MAX_NUMBER_FOUND_PARTICIPANTS = 5;
 const uint8_t SPDP_MAX_NUM_LOCATORS = 5;
 const Duration_t SPDP_LEASE_DURATION = {20, 0};
@@ -82,8 +87,14 @@ const int MAX_NUM_UDP_CONNECTIONS = 10;
 
 const int THREAD_POOL_NUM_WRITERS = 1;
 const int THREAD_POOL_NUM_READERS = 1;
+
+#ifdef STM32CUBEIDE
+const int THREAD_POOL_WRITER_PRIO = 19;
+const int THREAD_POOL_READER_PRIO = 19;
+#else
 const int THREAD_POOL_WRITER_PRIO = 3;
 const int THREAD_POOL_READER_PRIO = 3;
+#endif
 const int THREAD_POOL_WORKLOAD_QUEUE_LENGTH = 10;
 
 constexpr int OVERALL_HEAP_SIZE =
