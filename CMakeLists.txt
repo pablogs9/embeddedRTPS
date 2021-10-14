@@ -5,20 +5,20 @@ project(embeddedrtps)
 find_package(ament_cmake_ros REQUIRED)
 find_package(microcdr REQUIRED)
 
-set(RMW_ERTPS_MAX_HISTORY "10" CACHE STRING 
+set(ERTPS_MAX_HISTORY "10" CACHE STRING 
 "This value sets the number of history slots available for RMW subscriptions, requests and replies")
 
-set(RMW_ERTPS_MAX_NODES "2" CACHE STRING "This value sets the maximum number of nodes.")
+set(ERTPS_MAX_PARTICIPANTS "1" CACHE STRING "This value sets the maximum number of rtps participants.")
 
 # TODO: fix difference between best effort and reliable writers/readers
-set(RMW_ERTPS_MAX_PUBLISHERS "1" CACHE STRING "This value sets the maximum number of publishers for an application.")
-set(RMW_ERTPS_MAX_SUBSCRIPTIONS "1" CACHE STRING "This value sets the maximum number of subscriptions for an application.")
+set(ERTPS_MAX_PUBLISHERS "1" CACHE STRING "This value sets the maximum number of publishers for a domain.")
+set(ERTPS_MAX_SUBSCRIPTIONS "1" CACHE STRING "This value sets the maximum number of subscriptions for a domain.")
 
 # TODO: services and clients as pub/sub
-set(RMW_ERTPS_MAX_SERVICES "1" CACHE STRING "This value sets the maximum number of services for an application.")
-set(RMW_ERTPS_MAX_CLIENTS "1" CACHE STRING "This value sets the maximum number of clients for an application.")
-set(RMW_ERTPS_TOPIC_NAME_MAX_LENGTH "200" CACHE STRING "This value sets the maximum number of characters for a topic name.")
-set(RMW_ERTPS_TYPE_NAME_MAX_LENGTH "200" CACHE STRING "This value sets the maximum number of characters for a type name.")
+set(ERTPS_MAX_SERVICES "1" CACHE STRING "This value sets the maximum number of services for a domain.")
+set(ERTPS_MAX_CLIENTS "1" CACHE STRING "This value sets the maximum number of clients for a domain.")
+set(ERTPS_TOPIC_NAME_MAX_LENGTH "200" CACHE STRING "This value sets the maximum number of characters for a topic name.")
+set(ERTPS_TYPE_NAME_MAX_LENGTH "200" CACHE STRING "This value sets the maximum number of characters for a type name.")
 
 # Create source files with the define
 configure_file(${PROJECT_SOURCE_DIR}/include/rtps/config.h.in
