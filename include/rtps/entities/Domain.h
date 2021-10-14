@@ -38,8 +38,7 @@ Author: i11 - Embedded Software, RWTH Aachen University
 namespace rtps {
 class Domain {
 public:
-  uint8_t domainId = 0;
-  Domain();
+  Domain(uint8_t _domainId);
   ~Domain();
 
   bool completeInit();
@@ -59,6 +58,7 @@ public:
                        const char *typeName, bool reliable);
 
 private:
+  uint8_t domainId;
   ThreadPool m_threadPool;
   UdpDriver m_transport;
   std::array<Participant, Config::MAX_NUM_PARTICIPANTS> m_participants;

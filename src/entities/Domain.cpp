@@ -39,9 +39,10 @@ Author: i11 - Embedded Software, RWTH Aachen University
 
 using rtps::Domain;
 
-Domain::Domain()
+Domain::Domain(uint8_t _domainId)
     : m_threadPool(receiveJumppad, this),
-      m_transport(ThreadPool::readCallback, &m_threadPool) {
+      m_transport(ThreadPool::readCallback, &m_threadPool),
+      domainId(_domainId) {
   m_transport.createUdpConnection(getUserMulticastPort(domainId));
   m_transport.createUdpConnection(getBuiltInMulticastPort(domainId));
   m_transport.joinMultiCastGroup(transformIP4ToU32(239, 255, 0, 1));
@@ -76,7 +77,7 @@ void Domain::receiveCallback(const PacketInfo &packet) {
                "want to increase PBUF_POOL_BUFSIZE\n");
   }
 
-  if (isMetaMultiCastPort(packet.destPort)) {
+  if (isMetaMultiCastPort(packet.destPort, domainId)) {
     // Pass to all
     DOMAIN_LOG("Domain: Multicast to port %u\n", packet.destPort);
     for (auto i = 0; i < m_nextParticipantId - PARTICIPANT_START_ID; ++i) {
@@ -85,7 +86,7 @@ void Domain::receiveCallback(const PacketInfo &packet) {
           packet.buffer.firstElement->len);
     }
     // First Check if UserTraffic Multicast
-  } else if (isUserMultiCastPort(packet.destPort)) {
+  } else if (isUserMultiCastPort(packet.destPort, domainId)) {
     // Pass to Participant with assigned Multicast Adress (Port ist everytime
     // the same)
     DOMAIN_LOG("Domain: Got user multicast message on port %u\n",
@@ -101,7 +102,7 @@ void Domain::receiveCallback(const PacketInfo &packet) {
   } else {
     // Pass to addressed one only (Unicast, by Port)
     ParticipantId_t id = getParticipantIdFromUnicastPort(
-        packet.destPort, isUserPort(packet.destPort));
+        packet.destPort, isUserPort(packet.destPort), domainId);
     if (id != PARTICIPANT_ID_INVALID) {
       DOMAIN_LOG("Domain: Got unicast message on port %u\n", packet.destPort);
       if (id < m_nextParticipantId &&
@@ -131,7 +132,7 @@ rtps::Participant *Domain::createParticipant() {
   }
 
   auto &entry = m_participants[nextSlot];
-  entry.reuse(generateGuidPrefix(m_nextParticipantId), m_nextParticipantId);
+  entry.reuse(generateGuidPrefix(m_nextParticipantId), m_nextParticipantId, domainId);
   registerPort(entry);
   createBuiltinWritersAndReaders(entry);
   ++m_nextParticipantId;
