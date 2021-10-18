@@ -52,7 +52,17 @@ struct TopicData {
         reliabilityKind(ReliabilityKind_t::BEST_EFFORT),
         durabilityKind(DurabilityKind_t::TRANSIENT_LOCAL) {
     rtps::Locator someLocator = rtps::Locator::createUDPv4Locator(
-        192, 168, 0, 42, rtps::getUserUnicastPort(0));
+        192, 168, 0, 42, rtps::getUserUnicastPort(0, 0)); // TODO: Check implications
+    unicastLocator = someLocator;
+    multicastLocator = Locator();
+  };
+
+  TopicData(uint8_t domainId)
+      : endpointGuid(GUID_UNKNOWN), typeName{'\0'}, topicName{'\0'},
+        reliabilityKind(ReliabilityKind_t::BEST_EFFORT),
+        durabilityKind(DurabilityKind_t::TRANSIENT_LOCAL) {
+    rtps::Locator someLocator = rtps::Locator::createUDPv4Locator(
+        192, 168, 0, 42, rtps::getUserUnicastPort(0, domainId));
     unicastLocator = someLocator;
     multicastLocator = Locator();
   };

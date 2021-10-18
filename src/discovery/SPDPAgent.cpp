@@ -274,10 +274,10 @@ void SPDPAgent::addParticipantParameters() {
   const uint16_t guidSize = sizeof(GuidPrefix_t::id) + entityIdSize;
 
   const Locator userUniCastLocator =
-      getUserUnicastLocator(mp_participant->m_participantId);
+      getUserUnicastLocator(mp_participant->m_participantId, mp_participant->domainId);
   const Locator builtInUniCastLocator =
-      getBuiltInUnicastLocator(mp_participant->m_participantId);
-  const Locator builtInMultiCastLocator = getBuiltInMulticastLocator();
+      getBuiltInUnicastLocator(mp_participant->m_participantId, mp_participant->domainId);
+  const Locator builtInMultiCastLocator = getBuiltInMulticastLocator(mp_participant->domainId);
 
   ucdr_serialize_array_uint8_t(&m_microbuffer,
                                rtps::SMElement::SCHEME_PL_CDR_LE.data(),

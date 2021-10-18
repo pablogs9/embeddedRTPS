@@ -45,52 +45,52 @@ constexpr ip4_addr transformIP4ToU32(uint8_t MSB, uint8_t p2, uint8_t p1,
           ((uint32_t)(p2 << 8)) | MSB};
 }
 
-constexpr Ip4Port_t getBuiltInUnicastPort(ParticipantId_t participantId) {
-  return PB + DG * Config::DOMAIN_ID + D1 + PG * participantId;
+inline Ip4Port_t getBuiltInUnicastPort(ParticipantId_t participantId, uint8_t domainId) {
+  return PB + DG * domainId + D1 + PG * participantId;
 }
 
-constexpr Ip4Port_t getBuiltInMulticastPort() {
-  return PB + DG * Config::DOMAIN_ID + D0;
+inline Ip4Port_t getBuiltInMulticastPort(uint8_t domainId) {
+  return PB + DG * domainId + D0;
 }
 
-constexpr Ip4Port_t getUserUnicastPort(ParticipantId_t participantId) {
-  return PB + DG * Config::DOMAIN_ID + D3 + PG * participantId;
+inline Ip4Port_t getUserUnicastPort(ParticipantId_t participantId, uint8_t domainId) {
+  return PB + DG * domainId + D3 + PG * participantId;
 }
 
-constexpr Ip4Port_t getUserMulticastPort() {
-  return PB + DG * Config::DOMAIN_ID + D2;
+inline Ip4Port_t getUserMulticastPort(uint8_t domainId) {
+  return PB + DG * domainId + D2;
 }
 
 constexpr bool isUserPort(Ip4Port_t port) {
   return (port & 1) == 1;
 } // really useful? There may be other user ports than just odd ones?
 
-inline bool isMultiCastPort(Ip4Port_t port) {
-  const auto idWithoutBase = port - PB - DG * Config::DOMAIN_ID;
+inline bool isMultiCastPort(Ip4Port_t port, uint8_t domainId) {
+  const auto idWithoutBase = port - PB - DG * domainId;
   return idWithoutBase == D0 ||
          (idWithoutBase >= D2 &&
           idWithoutBase < D3); // There are several UserMulticastPorts!
 }
 
-inline bool isMetaMultiCastPort(Ip4Port_t port) {
-  const auto idWithoutBase = port - PB - DG * Config::DOMAIN_ID;
+inline bool isMetaMultiCastPort(Ip4Port_t port, uint8_t domainId) {
+  const auto idWithoutBase = port - PB - DG * domainId;
   return idWithoutBase == D0;
 }
 
-inline bool isUserMultiCastPort(Ip4Port_t port) {
-  const auto idWithoutBase = port - PB - DG * Config::DOMAIN_ID;
+inline bool isUserMultiCastPort(Ip4Port_t port, uint8_t domainId) {
+  const auto idWithoutBase = port - PB - DG * domainId;
   return (idWithoutBase >= D2 && idWithoutBase < D1);
 }
 
 inline bool isZeroAddress(ip4_addr_t address) { return address.addr == 0; }
 
 inline ParticipantId_t getParticipantIdFromUnicastPort(Ip4Port_t port,
-                                                       bool isUserPort) {
+                                                       bool isUserPort, uint8_t domainId) {
   // if(isMultiCastPort(port)){ // TODO remove?
   //    return PARTICIPANT_ID_INVALID;
   //}
 
-  const auto basePart = PB + DG * Config::DOMAIN_ID;
+  const auto basePart = PB + DG * domainId;
   ParticipantId_t participantPart = port - basePart;
 
   uint16_t offset = 0;

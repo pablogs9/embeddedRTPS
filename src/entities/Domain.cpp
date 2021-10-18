@@ -39,11 +39,12 @@ Author: i11 - Embedded Software, RWTH Aachen University
 
 using rtps::Domain;
 
-Domain::Domain()
+Domain::Domain(uint8_t _domainId)
     : m_threadPool(receiveJumppad, this),
-      m_transport(ThreadPool::readCallback, &m_threadPool) {
-  m_transport.createUdpConnection(getUserMulticastPort());
-  m_transport.createUdpConnection(getBuiltInMulticastPort());
+      m_transport(ThreadPool::readCallback, &m_threadPool),
+      domainId(_domainId) {
+  m_transport.createUdpConnection(getUserMulticastPort(domainId));
+  m_transport.createUdpConnection(getBuiltInMulticastPort(domainId));
   m_transport.joinMultiCastGroup(transformIP4ToU32(239, 255, 0, 1));
 }
 
@@ -76,7 +77,7 @@ void Domain::receiveCallback(const PacketInfo &packet) {
                "want to increase PBUF_POOL_BUFSIZE\n");
   }
 
-  if (isMetaMultiCastPort(packet.destPort)) {
+  if (isMetaMultiCastPort(packet.destPort, domainId)) {
     // Pass to all
     DOMAIN_LOG("Domain: Multicast to port %u\n", packet.destPort);
     for (auto i = 0; i < m_nextParticipantId - PARTICIPANT_START_ID; ++i) {
@@ -85,7 +86,7 @@ void Domain::receiveCallback(const PacketInfo &packet) {
           packet.buffer.firstElement->len);
     }
     // First Check if UserTraffic Multicast
-  } else if (isUserMultiCastPort(packet.destPort)) {
+  } else if (isUserMultiCastPort(packet.destPort, domainId)) {
     // Pass to Participant with assigned Multicast Adress (Port ist everytime
     // the same)
     DOMAIN_LOG("Domain: Got user multicast message on port %u\n",
@@ -101,7 +102,7 @@ void Domain::receiveCallback(const PacketInfo &packet) {
   } else {
     // Pass to addressed one only (Unicast, by Port)
     ParticipantId_t id = getParticipantIdFromUnicastPort(
-        packet.destPort, isUserPort(packet.destPort));
+        packet.destPort, isUserPort(packet.destPort), domainId);
     if (id != PARTICIPANT_ID_INVALID) {
       DOMAIN_LOG("Domain: Got unicast message on port %u\n", packet.destPort);
       if (id < m_nextParticipantId &&
@@ -131,7 +132,7 @@ rtps::Participant *Domain::createParticipant() {
   }
 
   auto &entry = m_participants[nextSlot];
-  entry.reuse(generateGuidPrefix(m_nextParticipantId), m_nextParticipantId);
+  entry.reuse(generateGuidPrefix(m_nextParticipantId), m_nextParticipantId, domainId);
   registerPort(entry);
   createBuiltinWritersAndReaders(entry);
   ++m_nextParticipantId;
@@ -143,7 +144,7 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
   StatelessWriter &spdpWriter = m_statelessWriters[m_numStatelessWriters++];
   StatelessReader &spdpReader = m_statelessReaders[m_numStatelessReaders++];
 
-  TopicData spdpWriterAttributes;
+  TopicData spdpWriterAttributes(domainId);
   spdpWriterAttributes.topicName[0] = '\0';
   spdpWriterAttributes.typeName[0] = '\0';
   spdpWriterAttributes.reliabilityKind = ReliabilityKind_t::BEST_EFFORT;
@@ -151,15 +152,15 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
   spdpWriterAttributes.endpointGuid.prefix = part.m_guidPrefix;
   spdpWriterAttributes.endpointGuid.entityId =
       ENTITYID_SPDP_BUILTIN_PARTICIPANT_WRITER;
-  spdpWriterAttributes.unicastLocator = getBuiltInMulticastLocator();
+  spdpWriterAttributes.unicastLocator = getBuiltInMulticastLocator(domainId);
 
   spdpWriter.init(spdpWriterAttributes, TopicKind_t::WITH_KEY, &m_threadPool,
                   m_transport);
   spdpWriter.addNewMatchedReader(
       ReaderProxy{{part.m_guidPrefix, ENTITYID_SPDP_BUILTIN_PARTICIPANT_READER},
-                  getBuiltInMulticastLocator()});
+                  getBuiltInMulticastLocator(domainId)});
 
-  TopicData spdpReaderAttributes;
+  TopicData spdpReaderAttributes(domainId);
   spdpReaderAttributes.endpointGuid = {
       part.m_guidPrefix, ENTITYID_SPDP_BUILTIN_PARTICIPANT_READER};
   spdpReader.init(spdpReaderAttributes);
@@ -171,14 +172,14 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
   StatefulWriter &sedpSubWriter = m_statefulWriters[m_numStatefulWriters++];
 
   // Prepare attributes
-  TopicData sedpAttributes;
+  TopicData sedpAttributes(domainId);
   sedpAttributes.topicName[0] = '\0';
   sedpAttributes.typeName[0] = '\0';
   sedpAttributes.reliabilityKind = ReliabilityKind_t::RELIABLE;
   sedpAttributes.durabilityKind = DurabilityKind_t::TRANSIENT_LOCAL;
   sedpAttributes.endpointGuid.prefix = part.m_guidPrefix;
   sedpAttributes.unicastLocator =
-      getBuiltInUnicastLocator(part.m_participantId);
+      getBuiltInUnicastLocator(part.m_participantId, domainId);
 
   // READER
   sedpAttributes.endpointGuid.entityId =
@@ -212,8 +213,8 @@ void Domain::createBuiltinWritersAndReaders(Participant &part) {
 }
 
 void Domain::registerPort(const Participant &part) {
-  m_transport.createUdpConnection(getUserUnicastPort(part.m_participantId));
-  m_transport.createUdpConnection(getBuiltInUnicastPort(part.m_participantId));
+  m_transport.createUdpConnection(getUserUnicastPort(part.m_participantId, domainId));
+  m_transport.createUdpConnection(getBuiltInUnicastPort(part.m_participantId, domainId));
 }
 
 void Domain::registerMulticastPort(Locator mcastLocator) {
@@ -324,7 +325,7 @@ rtps::Writer *Domain::createWriter(Participant &part, const char *topicName,
   }
 
   // TODO Distinguish WithKey and NoKey (Also changes EntityKind)
-  TopicData attributes;
+  TopicData attributes(domainId);
 
   if (strlen(topicName) > Config::MAX_TOPICNAME_LENGTH ||
       strlen(typeName) > Config::MAX_TYPENAME_LENGTH) {
@@ -336,7 +337,7 @@ rtps::Writer *Domain::createWriter(Participant &part, const char *topicName,
   attributes.endpointGuid.entityId = {
       part.getNextUserEntityKey(),
       EntityKind_t::USER_DEFINED_WRITER_WITHOUT_KEY};
-  attributes.unicastLocator = getUserUnicastLocator(part.m_participantId);
+  attributes.unicastLocator = getUserUnicastLocator(part.m_participantId, domainId);
   attributes.durabilityKind = DurabilityKind_t::TRANSIENT_LOCAL;
 
   DOMAIN_LOG("Creating writer[%s, %s]\n", topicName, typeName);
@@ -375,7 +376,7 @@ rtps::Reader *Domain::createReader(Participant &part, const char *topicName,
   }
 
   // TODO Distinguish WithKey and NoKey (Also changes EntityKind)
-  TopicData attributes;
+  TopicData attributes(domainId);
 
   if (strlen(topicName) > Config::MAX_TOPICNAME_LENGTH ||
       strlen(typeName) > Config::MAX_TYPENAME_LENGTH) {
@@ -387,13 +388,13 @@ rtps::Reader *Domain::createReader(Participant &part, const char *topicName,
   attributes.endpointGuid.entityId = {
       part.getNextUserEntityKey(),
       EntityKind_t::USER_DEFINED_READER_WITHOUT_KEY};
-  attributes.unicastLocator = getUserUnicastLocator(part.m_participantId);
+  attributes.unicastLocator = getUserUnicastLocator(part.m_participantId, domainId);
   if (!isZeroAddress(mcastaddress)) {
     if (ip4_addr_ismulticast(&mcastaddress)) {
       attributes.multicastLocator = rtps::Locator::createUDPv4Locator(
           ip4_addr1(&mcastaddress), ip4_addr2(&mcastaddress),
           ip4_addr3(&mcastaddress), ip4_addr4(&mcastaddress),
-          getUserMulticastPort());
+          getUserMulticastPort(domainId));
       m_transport.joinMultiCastGroup(
           attributes.multicastLocator.getIp4Address());
       registerMulticastPort(attributes.multicastLocator);

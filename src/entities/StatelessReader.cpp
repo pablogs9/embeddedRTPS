@@ -102,7 +102,7 @@ void StatelessReader::removeWriterOfParticipant(
 bool StatelessReader::onNewHeartbeat(const SubmessageHeartbeat &,
                                      const GuidPrefix_t &) {
   // nothing to do
-  return true;
+  return false;
 }
 
 #undef SLR_VERBOSE

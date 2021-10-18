@@ -40,10 +40,12 @@ class Participant {
 public:
   GuidPrefix_t m_guidPrefix;
   ParticipantId_t m_participantId;
+  uint8_t domainId;
 
   Participant();
   explicit Participant(const GuidPrefix_t &guidPrefix,
-                       ParticipantId_t participantId);
+                       ParticipantId_t participantId,
+                       uint8_t _domainId);
 
   // Not allowed because the message receiver contains a pointer to the
   // participant
@@ -55,7 +57,7 @@ public:
   ~Participant();
   bool isValid();
 
-  void reuse(const GuidPrefix_t &guidPrefix, ParticipantId_t participantId);
+  void reuse(const GuidPrefix_t &guidPrefix, ParticipantId_t participantId, uint8_t _domainId);
 
   std::array<uint8_t, 3> getNextUserEntityKey();
 
