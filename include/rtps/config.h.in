@@ -36,7 +36,7 @@ namespace rtps {
 // define only if using FreeRTOS
 #define OS_IS_FREERTOS
 
-#ifdef OS_IS_FREERTOS
+#ifdef STM32CUBEIDE
 #include "FreeRTOS.h"
 #include "task.h"
 #endif
