@@ -83,7 +83,7 @@ UdpDriver::createUdpConnection(Ip4Port_t receivePort) {
 }
 
 bool UdpDriver::isSameSubnet(ip4_addr_t addr) {
-#if defined(ESP_PLATFORM) || defined(STM32CUBEIDE)
+#ifdef ESP_PLATFORM
   return (ip4_addr_netcmp(&addr, &(netif_default->ip_addr.u_addr.ip4),
                           &(netif_default->netmask.u_addr.ip4)) != 0);
 #else
@@ -97,7 +97,7 @@ bool UdpDriver::joinMultiCastGroup(ip4_addr_t addr) const {
 
   {
     TcpipCoreLock lock;
-#if defined(ESP_PLATFORM) || defined(STM32CUBEIDE)
+#ifdef ESP_PLATFORM
   iret = igmp_joingroup(&IP_ADDR_ANY->u_addr.ip4, (&addr));
 #else
   iret = igmp_joingroup(IP_ADDR_ANY, (&addr));
@@ -124,7 +124,7 @@ bool UdpDriver::sendPacket(const UdpConnection &conn, ip4_addr_t &destAddr,
   {
     TcpipCoreLock lock;
 
-#if defined(ESP_PLATFORM) || defined(STM32CUBEIDE)
+#ifdef ESP_PLATFORM
     ip_addr_t aux = {.u_addr = {.ip4 = destAddr}, .type = IPADDR_TYPE_V4};
     err = udp_sendto(conn.pcb, &buffer, &aux, destPort);
 #else
